@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+final _firebase = FirebaseAuth.instance;
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -8,7 +11,6 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-
   final _formKey = GlobalKey<FormState>();
 
   var _isLogin = true;
@@ -16,15 +18,19 @@ class _AuthScreenState extends State<AuthScreen> {
   var _enteredEmail = '';
   var _enteredPassword = '';
 
-  void _submitData(){
+  void _submitData() {
     final isValid = _formKey.currentState!.validate();
-
-    if(isValid){
-      _formKey.currentState!.save();
-      print('Email --> ${_enteredEmail}');
-      print('Password --> ${_enteredPassword}');
+    if (!isValid) {
+      return;
     }
-
+    _formKey.currentState!.save();
+    print('Email --> ${_enteredEmail}');
+    print('Password --> ${_enteredPassword}');
+    if (_isLogin) {
+    } else {
+      _firebase.createUserWithEmailAndPassword(
+          email: _enteredEmail, password: _enteredPassword);
+    }
   }
 
   @override
@@ -63,13 +69,15 @@ class _AuthScreenState extends State<AuthScreen> {
                             keyboardType: TextInputType.emailAddress,
                             autocorrect: false,
                             textCapitalization: TextCapitalization.none,
-                            validator: (value){
-                              if(value == null || value.trim().isEmpty || !value.contains('@')){
+                            validator: (value) {
+                              if (value == null ||
+                                  value.trim().isEmpty ||
+                                  !value.contains('@')) {
                                 return 'Please entered valid email address';
                               }
-                              return null ;
+                              return null;
                             },
-                            onSaved: (value){
+                            onSaved: (value) {
                               _enteredEmail = value!;
                             },
                           ),
@@ -77,14 +85,14 @@ class _AuthScreenState extends State<AuthScreen> {
                             decoration: const InputDecoration(
                               labelText: 'Password',
                             ),
-                            validator: (value){
-                              if(value == null || value.trim().length < 6){
+                            validator: (value) {
+                              if (value == null || value.trim().length < 6) {
                                 return 'Password must be at least 6 characters long';
                               }
-                              return null ;
+                              return null;
                             },
                             obscureText: true,
-                            onSaved: (value){
+                            onSaved: (value) {
                               _enteredPassword = value!;
                             },
                           ),
@@ -94,8 +102,9 @@ class _AuthScreenState extends State<AuthScreen> {
                           ElevatedButton(
                             onPressed: _submitData,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.primaryContainer
-                            ),
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer),
                             child: Text(_isLogin ? 'Log in' : 'Sign Up'),
                           ),
                           TextButton(
