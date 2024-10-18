@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sign_in_button/sign_in_button.dart';
 
 final _firebase = FirebaseAuth.instance;
 
@@ -73,6 +74,15 @@ class _AuthScreenState extends State<AuthScreen> {
       setState(() {
         _isAuthenticating = false;
       });
+    }
+  }
+
+  void _googleAuth(){
+    try{
+      GoogleAuthProvider _googleAuthProvider = GoogleAuthProvider();
+      _firebase.signInWithProvider(_googleAuthProvider);
+    }catch(e){
+      print('Error --> $e}');
     }
   }
 
@@ -163,6 +173,11 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                           const SizedBox(
                             height: 20,
+                          ),
+                          if(!_isLogin)
+                          SignInButton(
+                            Buttons.google,
+                            onPressed: _googleAuth,
                           ),
                           if (_isAuthenticating)
                             const CircularProgressIndicator(),
