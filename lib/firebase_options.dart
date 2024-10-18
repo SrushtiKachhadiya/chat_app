@@ -63,6 +63,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1007522151015',
     projectId: 'chatapp-803a7',
     storageBucket: 'chatapp-803a7.appspot.com',
+    iosClientId: '1007522151015-1m1f43vf1gjrba66mmpmreqkol3r3r5d.apps.googleusercontent.com',
     iosBundleId: 'com.example.chatApp',
   );
 
@@ -72,6 +73,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1007522151015',
     projectId: 'chatapp-803a7',
     storageBucket: 'chatapp-803a7.appspot.com',
+    iosClientId: '1007522151015-1m1f43vf1gjrba66mmpmreqkol3r3r5d.apps.googleusercontent.com',
     iosBundleId: 'com.example.chatApp',
   );
 
