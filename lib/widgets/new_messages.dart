@@ -40,13 +40,12 @@ class _NewMessageState extends State<NewMessage> {
             ),
             controller: _messageController,
           )),
-          Expanded(
-              child: IconButton(
-                  onPressed:_submitMessage,
-                  icon: Icon(
-                    Icons.send,
-                    color: Theme.of(context).colorScheme.primary,
-                  )))
+          IconButton(
+              onPressed:_submitMessage,
+              icon: Icon(
+                Icons.send,
+                color: Theme.of(context).colorScheme.primary,
+              ))
         ],
       ),
     );
