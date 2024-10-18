@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:chat_app/widgets/user_image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 
 final _firebase = FirebaseAuth.instance;
@@ -42,7 +42,6 @@ class _AuthScreenState extends State<AuthScreen> {
       if (_isLogin) {
         final userCredentials = await _firebase.signInWithEmailAndPassword(
             email: _enteredEmail, password: _enteredPassword);
-        print('UserCredentials --> ${userCredentials}');
       } else {
         final userCredentials = await _firebase.createUserWithEmailAndPassword(
             email: _enteredEmail, password: _enteredPassword);
@@ -77,12 +76,58 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  void _googleAuth(){
-    try{
-      GoogleAuthProvider _googleAuthProvider = GoogleAuthProvider();
-      _firebase.signInWithProvider(_googleAuthProvider);
-    }catch(e){
-      print('Error --> $e}');
+  // void _signInWithGoogle(){
+  //   try{
+  //     GoogleAuthProvider _googleAuthProvider = GoogleAuthProvider();
+  //     _firebase.signInWithProvider(_googleAuthProvider);
+  //
+  //   }catch(e){
+  //     print('Error --> $e}');
+  //   }
+  // }
+
+  void _signInWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      User? user = userCredential.user;
+
+      if (user != null) {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        if (!userDoc.exists) {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .set(
+            {
+              'username': user.displayName,
+              'email': user.email,
+              'image_url': user.photoURL,
+            },
+          );
+        }
+      }
+    } catch (e) {
+      print('Error --> $e');
     }
   }
 
@@ -174,11 +219,12 @@ class _AuthScreenState extends State<AuthScreen> {
                           const SizedBox(
                             height: 20,
                           ),
-                          if(!_isLogin)
-                          SignInButton(
-                            Buttons.google,
-                            onPressed: _googleAuth,
-                          ),
+                         // if (!_isLogin)
+                            SignInButton(
+                              Buttons.google,
+                              text: _isLogin ? 'Sign in With Google' :'Sign up With Google',
+                              onPressed: _signInWithGoogle,
+                            ),
                           if (_isAuthenticating)
                             const CircularProgressIndicator(),
                           if (!_isAuthenticating)

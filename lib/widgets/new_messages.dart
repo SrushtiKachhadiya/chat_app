@@ -19,47 +19,52 @@ class _NewMessageState extends State<NewMessage> {
     super.dispose();
   }
 
-  void _submitMessage()async {
+  void _submitMessage() async {
     final enteredText = _messageController.text;
-    if(enteredText.trim().isEmpty){
+    if (enteredText.trim().isEmpty) {
       return;
     }
     FocusScope.of(context).unfocus();
     _messageController.clear();
 
     final user = FirebaseAuth.instance.currentUser!;
-    final userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    final userData = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
 
-    FirebaseFirestore.instance.collection('chat').add({
-      'text': enteredText,
-      'createAt': Timestamp.now(),
-      'userId' : user.uid,
-      'username' : userData.data()!['username'],
-      'userImage' : userData.data()!['image_url'],
-    });
+    FirebaseFirestore.instance.collection('chat').add(
+      {
+        'text': enteredText,
+        'createAt': Timestamp.now(),
+        'userId': user.uid,
+        'username': userData.data()!['username'],
+        'userImage': userData.data()!['image_url'],
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 15, right: 1, bottom: 14),
+      padding: const EdgeInsets.only(left: 15, right: 1, bottom: 14),
       child: Row(
         children: [
-          Expanded(child: TextField(
+          Expanded(
+              child: TextField(
             textCapitalization: TextCapitalization.sentences,
             autocorrect: true,
             enableSuggestions: true,
-            decoration: const InputDecoration(
-              labelText: 'Send a message'
-            ),
+            decoration: const InputDecoration(labelText: 'Send a message'),
             controller: _messageController,
           )),
           IconButton(
-              onPressed:_submitMessage,
-              icon: Icon(
-                Icons.send,
-                color: Theme.of(context).colorScheme.primary,
-              ),)
+            onPressed: _submitMessage,
+            icon: Icon(
+              Icons.send,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          )
         ],
       ),
     );
